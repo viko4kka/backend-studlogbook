@@ -1,28 +1,27 @@
 require("dotenv").config({ path: `${process.cwd()}/.env` });
 const express = require("express");
 const authRoute = require("./routes/authRoute");
+const catchAsync = require("./utils/catchAsync");
+const AppError = require("./utils/appError");
+const { stack } = require("sequelize/lib/utils");
+const globalErrorHandler = require("./controller/errorController");
 
 const app = express();
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-	res.status(200).json({
-		status: "success",
-		message: "Rest api are working",
-	});
-});
-
 //all routes will be here
 
 app.use("/api/auth", authRoute);
 
-app.use("*", (req, res, next) => {
-	res.json(404).json({
-		status: "fail",
-		message: "Page not found",
-	});
-});
+app.use(
+	"*",
+	catchAsync(async (req, res, next) => {
+		throw new AppError(`Can't find ${req.originalUrl} on this server`, 404);
+	})
+);
+
+app.use(globalErrorHandler);
 
 const PORT = process.env.APP_PORT || 3002;
 
