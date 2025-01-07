@@ -16,16 +16,52 @@ module.exports = sequelize.define(
 		},
 		userName: {
 			type: DataTypes.STRING,
+			allowNull: false,
+			validate: {
+				notNull: {
+					msg: "Username cannot be null",
+				},
+				notEmpty: {
+					msg: "Username cannot be empty",
+				},
+			},
 		},
 		email: {
 			type: DataTypes.STRING,
+			allowNull: false,
+			validate: {
+				notNull: {
+					msg: "Email cannot be null",
+				},
+				notEmpty: {
+					msg: "Email cannot be empty",
+				},
+				isEmail: {
+					msg: "Invalid email id",
+				},
+			},
 		},
 		password: {
 			type: DataTypes.STRING,
+			allowNull: false,
+			validate: {
+				notNull: {
+					msg: "Password cannot be null",
+				},
+				notEmpty: {
+					msg: "Password cannot be empty",
+				},
+			},
 		},
 		confirmPassword: {
 			type: DataTypes.VIRTUAL,
 			set(value) {
+				if (this.password.length < 7) {
+					throw new AppError(
+						"Password must be at least 7 characters long",
+						400
+					);
+				}
 				if (value === this.password) {
 					const hashPassword = bcrypt.hashSync(value, 10);
 					this.setDataValue("password", hashPassword);

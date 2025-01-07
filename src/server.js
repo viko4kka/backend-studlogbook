@@ -1,9 +1,9 @@
 require("dotenv").config({ path: `${process.cwd()}/.env` });
 const express = require("express");
+
 const authRoute = require("./routes/authRoute");
 const catchAsync = require("./utils/catchAsync");
 const AppError = require("./utils/appError");
-const { stack } = require("sequelize/lib/utils");
 const globalErrorHandler = require("./controller/errorController");
 
 const app = express();
