@@ -18,7 +18,12 @@ const register = catchAsync(async (req, res, next) => {
 		email: body.email,
 		password: body.password,
 		confirmPassword: body.confirmPassword,
+		role: body.role,
 	});
+
+	if (!["teacher", "student"].includes(body.role)) {
+		return next(new AppError("Role must be either teacher or student", 400));
+	}
 
 	if (!newUser) {
 		return next(new AppError("Failed to create the user", 400));
@@ -31,6 +36,7 @@ const register = catchAsync(async (req, res, next) => {
 
 	result.token = generateToken({
 		id: result.id,
+		role: result.role,
 	});
 
 	return res.status(201).json({
@@ -50,10 +56,11 @@ const login = catchAsync(async (req, res, next) => {
 	const result = await user.findOne({ where: { email } });
 	if (!result || !(await bcrypt.compare(password, result.password))) {
 		return next(new AppError("Incorrect email or password", 401));
-		}
+	}
 
 	const token = generateToken({
 		id: result.id,
+		role: result.role,
 	});
 
 	return res.json({
