@@ -72,24 +72,31 @@ const login = catchAsync(async (req, res, next) => {
 
 const getUser = catchAsync(async (req, res, next) => {
 	const token = req.body.token;
-	const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+	const decoded = null
 
 	if (!token) {
 		return next(new AppError("Token not found", 401));
 	}
-	// try {
-	// } catch (err) {
-	// 	return next(new AppError("Invalid token", 401));
-	// }
+	
+	
+	jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded)=>{
+		if(err){
+			return next(new AppError("Invalid token", 401));
+		}
 
-	const userData = await user.findOne({ where: { id: decoded.id } });
+		decoded = decoded; 
+		
+		const userData = await user.findOne({ where: { id: decoded.id } });
 
-	console.log(userData);
+		console.log(userData);
+	
+		return res.json({
+			status: "success",
+			data: userData,
+		});
+	})
 
-	return res.json({
-		status: "success",
-		data: userData,
-	});
+	
 });
 
 module.exports = {
