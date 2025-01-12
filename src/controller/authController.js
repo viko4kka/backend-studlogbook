@@ -1,8 +1,8 @@
-const user = require("../../db/models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const user = require("../../db/models/user");
 
 const generateToken = (payload) => {
 	return jwt.sign(payload, process.env.JWT_SECRET_KEY, {
@@ -70,7 +70,30 @@ const login = catchAsync(async (req, res, next) => {
 	});
 });
 
+const getUser = catchAsync(async (req, res, next) => {
+	const token = req.body.token;
+	const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+	if (!token) {
+		return next(new AppError("Token not found", 401));
+	}
+	// try {
+	// } catch (err) {
+	// 	return next(new AppError("Invalid token", 401));
+	// }
+
+	const userData = await user.findOne({ where: { id: decoded.id } });
+
+	console.log(userData);
+
+	return res.json({
+		status: "success",
+		data: userData,
+	});
+});
+
 module.exports = {
 	register,
 	login,
+	getUser,
 };

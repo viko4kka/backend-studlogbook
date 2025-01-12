@@ -1,51 +1,44 @@
-"use strict";
-
-const { DataTypes } = require("sequelize");
+const { Sequelize } = require("sequelize");
 const sequelize = require("../../config/database");
-const AppError = require("../../src/utils/appError");
 
 module.exports = sequelize.define(
 	"course",
 	{
 		id: {
 			allowNull: false,
-			type: DataTypes.INTEGER,
+			autoIncrement: true,
+			primaryKey: true,
+			type: Sequelize.INTEGER,
 		},
-		courseName: {
-			type: DataTypes.STRING,
-			allowNull: false,
+		title: {
+			type: Sequelize.STRING,
 		},
 		description: {
-			type: DataTypes.STRING,
-			allowNull: false,
+			type: Sequelize.STRING,
 		},
 		startDate: {
-			type: DataTypes.DATE,
-			allowNull: false,
+			type: Sequelize.DATE,
 		},
 		endDate: {
-			type: DataTypes.DATE,
-			allowNull: false,
+			type: Sequelize.DATE,
 		},
 		teacherId: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
+			type: Sequelize.INTEGER,
 		},
 		createdAt: {
-			type: DataTypes.DATE,
 			allowNull: false,
+			type: Sequelize.DATE,
 		},
-		updateAt: {
-			type: DataTypes.DATE,
+		updatedAt: {
 			allowNull: false,
+			type: Sequelize.DATE,
 		},
 		deletedAt: {
-			type: DataTypes.DATE,
-			allowNull: false,
+			type: Sequelize.DATE,
 		},
 	},
 	{
-		paranoid: true, //wlaczenie soft delete
+		paranoid: true,
 		freezeTableName: true,
 		modelName: "course",
 	}
