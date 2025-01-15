@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../../config/database");
 
 module.exports = sequelize.define(
@@ -8,33 +8,38 @@ module.exports = sequelize.define(
 			allowNull: false,
 			autoIncrement: true,
 			primaryKey: true,
-			type: Sequelize.INTEGER,
+			type: DataTypes.INTEGER,
 		},
 		title: {
-			type: Sequelize.STRING,
+			type: DataTypes.STRING,
 		},
 		description: {
-			type: Sequelize.STRING,
+			type: DataTypes.STRING,
 		},
 		startDate: {
-			type: Sequelize.DATE,
+			type: DataTypes.DATE,
 		},
 		endDate: {
-			type: Sequelize.DATE,
+			type: DataTypes.DATE,
 		},
 		teacherId: {
-			type: Sequelize.INTEGER,
+			type: DataTypes.STRING,
+		},
+		studentsIds: {
+			type: DataTypes.ARRAY(DataTypes.STRING),
+			allowNull: true,
 		},
 		createdAt: {
 			allowNull: false,
-			type: Sequelize.DATE,
+			type: DataTypes.DATE,
 		},
 		updatedAt: {
 			allowNull: false,
-			type: Sequelize.DATE,
+			type: DataTypes.DATE,
 		},
 		deletedAt: {
-			type: Sequelize.DATE,
+			allowNull: true,
+			type: DataTypes.DATE,
 		},
 	},
 	{

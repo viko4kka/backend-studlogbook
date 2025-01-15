@@ -22,7 +22,11 @@ module.exports = {
 				type: Sequelize.DATE,
 			},
 			teacherId: {
-				type: Sequelize.INTEGER,
+				type: Sequelize.STRING,
+			},
+			studentsIds: {
+				type: Sequelize.ARRAY(Sequelize.STRING),
+				allowNull: true,
 			},
 			createdAt: {
 				allowNull: false,
@@ -33,6 +37,7 @@ module.exports = {
 				type: Sequelize.DATE,
 			},
 			deletedAt: {
+				allowNull: true,
 				type: Sequelize.DATE,
 			},
 		});

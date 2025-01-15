@@ -1,4 +1,6 @@
+const sequelize = require("../../config/database");
 const course = require("../../db/models/course");
+const user = require("../../db/models/user");
 const AppError = require("../utils/appError");
 
 //do tworzenia kursu
@@ -54,7 +56,7 @@ const getCourseById = async (req, res, next) => {
 };
 const updateCourse = async (req, res, next) => {
 	const { id } = req.params;
-	const { title, description, startDate, endDate, teacherId } = req.body;
+	const { title, description, startDate, endDate } = req.body;
 
 	const findCourse = await course.findOne({
 		where: {
@@ -71,7 +73,6 @@ const updateCourse = async (req, res, next) => {
 	if (description) updateData.description = description;
 	if (startDate) updateData.startDate = startDate;
 	if (endDate) updateData.endDate = endDate;
-	if (teacherId) updateData.teacherId = teacherId;
 
 	const updatedRows = await course.update(updateData, {
 		where: { id },
@@ -102,9 +103,9 @@ const deleteCourse = async (req, res, next) => {
 		},
 	});
 
-	if (!deletedCourse) {
-		return next(new AppError(`Failed to delete course with id ${id}`, 400));
-	}
+	// if (!deletedCourse) {
+	// 	return next(new AppError(`Failed to delete course with id ${id}`, 400));
+	// }
 
 	return res.status(200).json({
 		status: "success",
@@ -113,10 +114,134 @@ const deleteCourse = async (req, res, next) => {
 	});
 };
 
+const getAllStudent = async (req, res, next) => {
+	const students = await user.findAll({
+		where: {
+			role: "student",
+		},
+	});
+
+	return res.status(200).json({
+		status: "success",
+		data: students,
+		message: "All students fetched successfully",
+	});
+};
+
+const addStudentToCourse = async (req, res, next) => {
+	const { courseId, studentId } = req.body;
+
+	try {
+		// Znalezienie kursu w bazie danych
+		const courseData = await course.findOne({
+			where: { id: courseId },
+		});
+
+		if (!courseData) {
+			return res.status(404).json({
+				status: "error",
+				message: "Course not found",
+			});
+		}
+
+		// Sprawdzenie i aktualizacja listy studentów
+		const studentsIds = courseData.studentsIds || [];
+		if (studentsIds.includes(studentId)) {
+			return res.status(400).json({
+				status: "error",
+				message: "Student already added to the course",
+			});
+		}
+
+		studentsIds.push(studentId);
+
+		// Aktualizacja kursu w bazie danych
+		await course.update(
+			{ studentsIds },
+			{
+				where: { id: courseId },
+			}
+		);
+
+		return res.status(200).json({
+			status: "success",
+			message: "Student added to course successfully",
+		});
+	} catch (error) {
+		console.error("Error adding student to course:", error);
+		return res.status(500).json({
+			status: "error",
+			message: "An error occurred while adding student to course",
+		});
+	}
+};
+const removeStudentFromCourse = async (req, res, next) => {
+	const { courseId, studentId } = req.body;
+
+	// Sprawdzamy, czy courseId i studentId są liczbami
+	if (isNaN(courseId) || isNaN(studentId)) {
+		return res.status(400).json({
+			status: "error",
+			message: "Invalid courseId or studentId",
+		});
+	}
+
+	try {
+		// Sprawdzamy, czy kurs istnieje
+		const courseData = await course.findOne({
+			where: { id: courseId },
+		});
+
+		if (!courseData) {
+			return res.status(404).json({
+				status: "error",
+				message: "Course not found",
+			});
+		}
+
+		// Sprawdzamy, czy student jest przypisany do kursu
+		const studentsIds = courseData.studentsIds || [];
+		if (!studentsIds.includes(studentId.toString())) {
+			return res.status(400).json({
+				status: "error",
+				message: "Student not enrolled in this course",
+			});
+		}
+
+		// Usuwamy studenta z tablicy studentsIds
+		const updatedStudentsIds = studentsIds.filter(
+			(id) => id !== studentId.toString()
+		);
+
+		// Aktualizujemy kurs w bazie danych
+		await course.update(
+			{ studentsIds: updatedStudentsIds },
+			{
+				where: { id: courseId },
+			}
+		);
+
+		return res.status(200).json({
+			status: "success",
+			message: "Student removed from course successfully",
+		});
+	} catch (error) {
+		console.error("Error removing student from course:", error);
+		return res.status(500).json({
+			status: "error",
+			message: "An error occurred while removing student from course",
+		});
+	}
+};
+
 module.exports = {
 	createCourse,
 	getAllCourses,
 	getCourseById,
 	updateCourse,
-	deleteCourse
+	deleteCourse,
+	getAllStudent,
+
+	addStudentToCourse,
+	removeStudentFromCourse,
 };

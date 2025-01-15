@@ -3,7 +3,10 @@ const {
 	getAllCourses,
 	getCourseById,
 	updateCourse,
-    deleteCourse,
+	deleteCourse,
+	getAllStudent,
+	removeStudentFromCourse,
+	addStudentToCourse,
 } = require("../controller/courseController");
 
 const router = require("express").Router();
@@ -17,5 +20,11 @@ router.route("/:id").get(getCourseById);
 router.route("/:id").put(updateCourse);
 
 router.route("/:id").delete(deleteCourse);
+
+router.route("/all/students").get(getAllStudent);
+
+router.route("/student/add").post(addStudentToCourse);
+
+router.route("/student/delete").delete(removeStudentFromCourse);
 
 module.exports = router;

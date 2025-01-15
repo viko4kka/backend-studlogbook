@@ -74,7 +74,7 @@ module.exports = sequelize.define(
 			},
 		},
 		role: {
-			type: DataTypes.ENUM("student", "teacher", "admin"),
+			type: DataTypes.ENUM("student", "teacher" ),
 			allowNull: false,
 		},
 		createdAt: {

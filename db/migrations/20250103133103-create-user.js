@@ -20,7 +20,7 @@ module.exports = {
 				type: Sequelize.STRING,
 			},
 			role: {
-				type: Sequelize.ENUM("student", "teacher", "admin"),
+				type: Sequelize.ENUM("student", "teacher"),
 				allowNull: false,
 			},
 			createdAt: {
