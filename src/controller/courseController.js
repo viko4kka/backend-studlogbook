@@ -103,9 +103,7 @@ const deleteCourse = async (req, res, next) => {
 		},
 	});
 
-	// if (!deletedCourse) {
-	// 	return next(new AppError(`Failed to delete course with id ${id}`, 400));
-	// }
+
 
 	return res.status(200).json({
 		status: "success",
@@ -129,7 +127,7 @@ const getAllStudent = async (req, res, next) => {
 };
 
 const addStudentToCourse = async (req, res, next) => {
-	const { courseId, studentId } = req.body;
+	const { courseId, studentsIds } = req.body;
 
 	try {
 		// Znalezienie kursu w bazie danych
@@ -144,18 +142,7 @@ const addStudentToCourse = async (req, res, next) => {
 			});
 		}
 
-		// Sprawdzenie i aktualizacja listy studentów
-		const studentsIds = courseData.studentsIds || [];
-		if (studentsIds.includes(studentId)) {
-			return res.status(400).json({
-				status: "error",
-				message: "Student already added to the course",
-			});
-		}
-
-		studentsIds.push(studentId);
-
-		// Aktualizacja kursu w bazie danych
+		
 		await course.update(
 			{ studentsIds },
 			{
@@ -178,7 +165,6 @@ const addStudentToCourse = async (req, res, next) => {
 const removeStudentFromCourse = async (req, res, next) => {
 	const { courseId, studentId } = req.body;
 
-	// Sprawdzamy, czy courseId i studentId są liczbami
 	if (isNaN(courseId) || isNaN(studentId)) {
 		return res.status(400).json({
 			status: "error",
@@ -187,7 +173,6 @@ const removeStudentFromCourse = async (req, res, next) => {
 	}
 
 	try {
-		// Sprawdzamy, czy kurs istnieje
 		const courseData = await course.findOne({
 			where: { id: courseId },
 		});
@@ -199,7 +184,6 @@ const removeStudentFromCourse = async (req, res, next) => {
 			});
 		}
 
-		// Sprawdzamy, czy student jest przypisany do kursu
 		const studentsIds = courseData.studentsIds || [];
 		if (!studentsIds.includes(studentId.toString())) {
 			return res.status(400).json({
@@ -208,12 +192,10 @@ const removeStudentFromCourse = async (req, res, next) => {
 			});
 		}
 
-		// Usuwamy studenta z tablicy studentsIds
 		const updatedStudentsIds = studentsIds.filter(
 			(id) => id !== studentId.toString()
 		);
 
-		// Aktualizujemy kurs w bazie danych
 		await course.update(
 			{ studentsIds: updatedStudentsIds },
 			{

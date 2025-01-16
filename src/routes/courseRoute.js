@@ -25,6 +25,6 @@ router.route("/all/students").get(getAllStudent);
 
 router.route("/student/add").post(addStudentToCourse);
 
-router.route("/student/delete").delete(removeStudentFromCourse);
+// router.route("/student/delete").delete(removeStudentFromCourse);s
 
 module.exports = router;
